@@ -2,7 +2,7 @@
 #include<ctype.h>
 #include<stdlib.h>
 #include<string.h>
-
+int idflag=0, litsize=0;char lit[50][50];
 int isKeyword(char buffer[]){
 	char keywords[32][10] = {"auto","break","case","char","const","continue","default",
 				"do","double","else","enum","extern","float","for","goto",
@@ -14,6 +14,9 @@ int isKeyword(char buffer[]){
 	for(i = 0; i < 32; ++i){
 		if(strcmp(keywords[i], buffer) == 0){
 			flag = 1;
+			if(i==3 || i==8 || i==12 || i==16 || i==17 || i== 20)	{
+				idflag=1;//printf("caught identifier\n");
+			}
 			break;
 		}
 	}
@@ -168,7 +171,7 @@ void split(char buffer[],int pos,int len){
 	
 	while(pos<len){
 		int i=0;
-		while(pos<len && buffer[pos]!='(' && buffer[pos]!='<' && buffer[pos]!='+' && buffer[pos]!='-' && buffer[pos]!='*' && buffer[pos]!='/' && buffer[pos]!=')' && buffer[pos]!='=' & buffer[pos]!='[' 
+		while(pos<len && buffer[pos]!='(' && buffer[pos]!='<' && buffer[pos]!=',' && buffer[pos]!='+' && buffer[pos]!='-' && buffer[pos]!='*' && buffer[pos]!='/' && buffer[pos]!=')' && buffer[pos]!='=' & buffer[pos]!='[' 
                        && buffer[pos]!=']' && buffer[pos]!='{'&& buffer[pos]!='}' && buffer[pos]!=';' && buffer[pos]!=','&& !( isspace( buffer[pos] ) )   ){
 
 			temp[i]=buffer[pos];
@@ -192,7 +195,7 @@ void split(char buffer[],int pos,int len){
 
 					}
 					temp[i]='\0';
-					printf("%s is a special thing\n",temp);
+					printf("%s is a literal\n",temp);
 					printf("\" is a symbol\n");
 					++pos;
 					continue;
@@ -200,6 +203,17 @@ void split(char buffer[],int pos,int len){
 				else if(temp[0]==','){
 					printf(", is a symbol\n");
 
+					char t[20]; int i=0;
+					pos++;
+					while(isalnum(buffer[pos]) ){
+						t[i]=buffer[pos];
+						++i;++pos;
+					}
+					t[i]='\0';
+					printf("%s is an identifier\n",t);
+					isoperator(buffer[pos+1],'\0');
+					--pos;
+					
 
 				}
 				else if(temp[0]=='/' && temp[1]=='/'){
@@ -209,9 +223,39 @@ void split(char buffer[],int pos,int len){
 				}//else{	printf("hi%chi\n",buffer[pos-2]);
 					
 				//}
-				
+				if(idflag){//printf("Entered\n");
+					strcpy(lit[litsize++],temp);
+					idflag=0;printf("%s\n",lit[litsize-1]);
+					printf("%s is literal\n",temp);
+				}else{	
 
-				printf("%s is literal\n",temp);
+					int fflag=0;
+					for(int i=0;i<litsize;++i){
+						if(strcmp(lit[i],temp)==0){
+							fflag=1;
+							break;
+						}
+					
+					}
+					if(fflag)
+						printf("%s is a valid identifier\n",temp);
+					else{
+						int flag=1;
+						for(int i=0;i<strlen(temp);i++){
+							if(!isdigit(temp[i])){
+								flag=0;
+								break;
+							}
+						}
+						if(flag)
+							printf("%s is a constant\n",temp);
+						else if(strcmp(temp,"printf")==0)
+							printf("%s is a literal",temp);
+						else
+							printf("%s is an invalid identifier\n",temp);
+				
+					}
+				}
 			}
 				int flag=isoperator(buffer[pos],buffer[pos+1]);
 				//printf("hi%chi\n",buffer[pos]);
@@ -228,16 +272,6 @@ void split(char buffer[],int pos,int len){
 			case ';':	printf("; is a symbol\n");break;
 			//case '=':	printf("= is an operator\n");break;
 			case ',':	printf(", is a symbol\n");
-					char t[20]; int i=0;
-					pos++;
-					while(isalnum(buffer[pos]) ){
-						t[i]=buffer[pos];
-						++i;++pos;
-					}
-					t[i]='\0';
-					printf("%s is a literal\n",t);
-					isoperator(buffer[pos+1],'\0');
-					--pos;
 					
 					break;
 
