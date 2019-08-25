@@ -1,0 +1,12 @@
+#include<stdio.h>
+/*hekhrekjrhej
+jkadhf */
+void main(){
+	    
+	//This programs finds the product of 5 and 3 
+	int a=5;
+	int b=3;
+	for(int i=3; i<=7 && i<8; ++i){
+		printf("The product of %d and %d is:%d",a,b,a*b);//prints the product	
+	}
+}
