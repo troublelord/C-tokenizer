@@ -4,17 +4,17 @@
 #include<string.h>
 int idflag=0, litsize=0;char lit[50][50];
 int isKeyword(char buffer[]){
-	char keywords[32][10] = {"auto","break","case","char","const","continue","default",
+	char keywords[33][10] = {"auto","break","case","char","const","continue","default",
 				"do","double","else","enum","extern","float","for","goto",
 				"if","int","long","register","return","short","signed",
 				"sizeof","static","struct","switch","typedef","union",
-				"unsigned","void","volatile","while"};
+				"unsigned","void","volatile","while","main"};
 	int i, flag = 0;
 	
-	for(i = 0; i < 32; ++i){
+	for(i = 0; i < 33; ++i){
 		if(strcmp(keywords[i], buffer) == 0){
 			flag = 1;
-			if(i==3 || i==8 || i==12 || i==16 || i==17 || i== 20)	{
+			if(i==3 || i==8 || i==12 || i==16 || i==17 || i== 20 || i==29)	{
 				idflag=1;//printf("caught identifier\n");
 			}
 			break;
@@ -27,7 +27,7 @@ int isKeyword(char buffer[]){
 int isPreprocessor(char buffer[], int i){
 	
 	if(buffer[i]=='#'){
-		printf("# is a special symbol\n");
+		printf("# is a delimiter\n");
 		++i;
 		while(isspace(buffer[i])) i++; // remove leading whitespaces
 		while(buffer[i]!='<' && !(isspace(buffer[i]) ) ) { printf("%c",buffer[i]); ++i;}
@@ -40,6 +40,16 @@ int isPreprocessor(char buffer[], int i){
 			printf(" is a library\n");
 			if(buffer[i]=='>')
 			printf("> is a special symbol\n");
+		}
+		else{
+			while(isspace(buffer[i])) i++;
+			while(!(isspace(buffer[i]) ) ) { printf("%c",buffer[i]); 
+				++i;}
+			printf(" is a valid identifier\n");
+			while(isspace(buffer[i])) i++;
+			while(!(isspace(buffer[i]) ) ) { printf("%c",buffer[i]); 
+				++i;}
+			printf(" is a constant\n");
 		}
 		return 1;
 	}else{
@@ -85,12 +95,27 @@ int isoperator(char ch,char a){
 				printf("++ is an operator\n");
 				return 1;
 			  }
+			else if(a=='='){ 
+				printf("+= is an operator\n");
+				return 1;
+			  }
 			  else{
 			
 				printf("+ is an operator\n");break;
 
 			}
-		case '-': printf("- is an operator\n");break;
+		case '-': if(a=='-'){ 
+				printf("-- is an operator\n");
+				return 1;
+			  }else if(a=='='){ 
+				printf("-= is an operator\n");
+				return 1;
+			  }
+			  else{
+			
+				printf("- is an operator\n");break;
+
+			}
 		case '<': if(a=='='){ 
 				printf("<= is an operator\n");
 				return 1;
@@ -138,6 +163,9 @@ int isoperator(char ch,char a){
 		case '/': if(a=='/'){ 
 				//printf(">= is an operator\n");
 				return 2;
+			  }else if(a=='='){ 
+				printf("-= is an operator\n");
+				return 1;
 			  }
 			  else{
 			
@@ -153,7 +181,15 @@ int isoperator(char ch,char a){
 				printf("= is an operator\n");break;
 
 			}
-		case '*': printf("* is an operator\n");break;
+		case '*': if(a=='='){ 
+				printf("*= is an operator\n");
+				return 1;
+			  }
+			  else{
+			
+				printf("* is an operator\n");break;
+
+			}
 		case '%': printf("\% is an operator\n");break;
 		case '?': printf("? is an operator\n");break;
 		case ':': printf(": is an operator\n");break;
